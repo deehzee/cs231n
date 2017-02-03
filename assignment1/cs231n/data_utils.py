@@ -3,6 +3,7 @@ import numpy as np
 import os
 from scipy.misc import imread
 
+
 def load_CIFAR_batch(filename):
     """ Load single batch of cifar. """
     with open(filename, 'rb') as f:
@@ -14,20 +15,22 @@ def load_CIFAR_batch(filename):
         Y = np.array(Y)
         return X, Y
 
+
 def load_CIFAR10(ROOT):
     """ Load all of cifar. """
     xs = []
     ys = []
-    for b in range(1,6):
+    for b in range(1, 6):
         f = os.path.join(ROOT, 'data_batch_%d' % (b, ))
         X, Y = load_CIFAR_batch(f)
         xs.append(X)
-        ys.append(Y)    
+        ys.append(Y)
     Xtr = np.concatenate(xs)
     Ytr = np.concatenate(ys)
     del X, Y
     Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
     return Xtr, Ytr, Xte, Yte
+
 
 def load_tiny_imagenet(path, dtype=np.float32):
     """
@@ -73,27 +76,28 @@ def load_tiny_imagenet(path, dtype=np.float32):
                 i + 1, len(wnids)))
         # To figure out the filenames we need to open the boxes file
         boxes_file = os.path.join(path, 'train', wnid,
-                                 '{}_boxes.txt'.format(wnid))
+                                  '{}_boxes.txt'.format(wnid))
         with open(boxes_file, 'r') as f:
             filenames = [x.split('\t')[0] for x in f]
         num_images = len(filenames)
-        
+
         X_train_block = np.zeros((num_images, 3, 64, 64), dtype=dtype)
-        y_train_block = wnid_to_label[wnid] * np.ones(num_images, dtype=np.int64)
+        y_train_block = wnid_to_label[wnid] * \
+            np.ones(num_images, dtype=np.int64)
         for j, img_file in enumerate(filenames):
             img_file = os.path.join(path, 'train', wnid, 'images', img_file)
             img = imread(img_file)
             if img.ndim == 2:
-                ## grayscale file
+                # grayscale file
                 img.shape = (64, 64, 1)
             X_train_block[j] = img.transpose(2, 0, 1)
         X_train.append(X_train_block)
         y_train.append(y_train_block)
-            
+
     # We need to concatenate all training data
     X_train = np.concatenate(X_train, axis=0)
     y_train = np.concatenate(y_train, axis=0)
-    
+
     # Next load validation data
     with open(os.path.join(path, 'val', 'val_annotations.txt'), 'r') as f:
         img_files = []
@@ -132,9 +136,10 @@ def load_tiny_imagenet(path, dtype=np.float32):
             for line in f:
                 line = line.split('\t')
                 img_file_to_wnid[line[0]] = line[1]
-        y_test = [wnid_to_label[img_file_to_wnid[img_file]] for img_file in img_files]
+        y_test = [wnid_to_label[img_file_to_wnid[img_file]]
+                  for img_file in img_files]
         y_test = np.array(y_test)
-    
+
     return class_names, X_train, y_train, X_val, y_val, X_test, y_test
 
 
