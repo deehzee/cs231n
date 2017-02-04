@@ -77,8 +77,8 @@ def softmax_loss_vectorized(W, X, y, reg):
     cs = -np.max(scores, axis=1)[:, np.newaxis] # numerical stability
     exps = np.exp(scores + cs)
     probs = exps / np.sum(exps, axis=1, keepdims=True)
-    log_losses = -np.log(probs[np.arange(num_train), y])
-    loss = np.sum(log_losses)
+    losses = -np.log(probs[np.arange(num_train), y])
+    loss = np.sum(losses)    
     # Gradient
     dscores = np.zeros_like(scores)
     dscores[np.arange(num_train), y] += -1
